@@ -1,13 +1,18 @@
 package com.s0meth1ng;
 
+import java.util.Objects;
+
 public class Fraction implements IFraction {
 
     private int numerator, denominator;
 
     public Fraction(int numerator, int denominator) throws ArithmeticException {
+        if (denominator < 0) {
+            numerator = -numerator;
+            denominator = -denominator;
+        }
         setDenominator(denominator);
         setNumerator(numerator);
-        normalize();
     }
     public void setNumerator(int numerator) {
         this.numerator = numerator;
@@ -17,6 +22,10 @@ public class Fraction implements IFraction {
             throw new ArithmeticException("Invalid denominator value");
         }
         this.denominator = denominator;
+        if (denominator < 0) {
+            this.numerator = -this.numerator;
+            this.denominator = -this.denominator;
+        }
     }
     public int getNumerator() {
         return numerator;
@@ -25,14 +34,10 @@ public class Fraction implements IFraction {
         return denominator;
     }
 
-    private void normalize() {
+    public void normalize() {
         if (this.numerator == 0) {
             this.setDenominator(1);
             return;
-        }
-        if (this.denominator < 0) {
-            this.setNumerator(-this.numerator);
-            this.setDenominator(-this.denominator);
         }
         int hcf = getHighestCommonFactor(numerator, denominator);
         if (hcf > 1) {
@@ -80,11 +85,19 @@ public class Fraction implements IFraction {
         return this.numerator * (newDenominator/this.denominator);
     }
 
+    private Fraction getFractionFromInt(int n, int denominator) {
+        return new Fraction(denominator * n, denominator);
+    }
+
     @Override
     public Fraction plus(Fraction fraction) {
         int newDenominator = getLowestCommonDenominator(fraction);
         int newNumerator = this.getNewNumerator(newDenominator) + fraction.getNewNumerator(newDenominator);
         return new Fraction(newNumerator, newDenominator);
+    }
+    @Override
+    public Fraction plus(int n) {
+        return this.plus(getFractionFromInt(n, this.denominator));
     }
 
     @Override
@@ -93,10 +106,18 @@ public class Fraction implements IFraction {
         int newNumerator = this.getNewNumerator(newDenominator) - fraction.getNewNumerator(newDenominator);
         return new Fraction(newNumerator, newDenominator);
     }
+    @Override
+    public Fraction minus(int n) {
+        return this.minus(getFractionFromInt(n, this.denominator));
+    }
 
     @Override
     public Fraction multiply(Fraction fraction) {
         return new Fraction(this.numerator * fraction.getNumerator(), this.denominator * fraction.getDenominator());
+    }
+    @Override
+    public Fraction multiply(int n) {
+        return new Fraction(this.numerator * n, this.denominator);
     }
 
     @Override
@@ -105,6 +126,32 @@ public class Fraction implements IFraction {
             throw new ArithmeticException("Division by zero");
         }
         return new Fraction(this.numerator * fraction.getDenominator(), this.denominator * fraction.getNumerator());
+    }
+    @Override
+    public Fraction divide(int n) throws ArithmeticException {
+        if (n == 0) {
+            throw new ArithmeticException("Division by zero");
+        }
+        return new Fraction(this.numerator, this.denominator * n);
+    }
+
+    public boolean equals(int n) {
+        if (this.numerator % this.denominator == 0) {
+            return (this.numerator / this.denominator) == n;
+        }
+        return false;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Fraction f = (Fraction) o;
+        return this.numerator == f.getNumerator() &&
+                this.denominator == f.getDenominator();
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(getNumerator(), getDenominator());
     }
 
     public String toString() {
