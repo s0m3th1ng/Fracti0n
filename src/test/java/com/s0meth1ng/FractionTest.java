@@ -45,59 +45,67 @@ class FractionTest {
     @Test
     void plus() {
         Fraction expected = new Fraction(44 + 121, 484);
-        Fraction actual = f1.plus(f2);
-        assertNotNull(actual);
-        assertEquals(expected, actual);
+        operationTestForFraction(expected, f1::plus);
 
         expected = new Fraction(22 + 242*3, 242);
-        actual = f1.plus(num);
-        assertNotNull(actual);
-        assertEquals(expected, actual);
+        operationTestForInt(expected, f1::plus);
     }
 
     @Test
     void minus() {
         Fraction expected = new Fraction(44 - 121, 484);
-        Fraction actual = f1.minus(f2);
-        assertNotNull(actual);
-        assertEquals(expected, actual);
+        operationTestForFraction(expected, f1::minus);
 
         expected = new Fraction(22 - 242*3, 242);
-        actual = f1.minus(num);
-        assertNotNull(actual);
-        assertEquals(expected, actual);
+        operationTestForInt(expected, f1::minus);
     }
 
     @Test
     void multiply() {
         Fraction expected = new Fraction(22 * 1, 242 * 4);
-        Fraction actual = f1.multiply(f2);
-        assertNotNull(actual);
-        assertEquals(expected, actual);
+        operationTestForFraction(expected, f1::multiply);
 
         expected = new Fraction(22 * 3, 242);
-        actual = f1.multiply(num);
-        assertNotNull(actual);
-        assertEquals(expected, actual);
+        operationTestForInt(expected, f1::multiply);
     }
 
     @Test
     void divide() {
         Fraction expected = new Fraction(22 * 4, 242 * 1);
-        Fraction actual = f1.divide(f2);
-        assertNotNull(actual);
-        assertEquals(expected, actual);
+        operationTestForFraction(expected, f1::divide);
+
+        expected = new Fraction(22, 242 * 3);
+        operationTestForInt(expected, f1::divide);
 
         Fraction zeroDivide = new Fraction(0, 1);
         assertThrows(ArithmeticException.class, () -> f1.divide(zeroDivide));
 
-        expected = new Fraction(22, 242 * 3);
-        actual = f1.divide(num);
+        int zero = 0;
+        assertThrows(ArithmeticException.class, () -> f1.divide(zero));
+    }
+
+    @FunctionalInterface
+    interface OperationFraction {
+        Fraction operation(Fraction f);
+    }
+    void operationTestForFraction(Fraction expected, OperationFraction test) {
+        Fraction actual = test.operation(f2);
         assertNotNull(actual);
         assertEquals(expected, actual);
 
-        int zero = 0;
-        assertThrows(ArithmeticException.class, () -> f1.divide(zero));
+        //NPE or IAE depends on configuration. That's why Exception is used
+        //https://stackoverflow.com/questions/40847472/why-nonnull-annotation-checked-at-runtime
+        assertThrows(Exception.class, () -> test.operation(null));
+    }
+
+    @FunctionalInterface
+    interface OperationInt {
+        Fraction operation(int n);
+    }
+    void operationTestForInt(Fraction expected, OperationInt test) {
+        Fraction actual = test.operation(num);
+        assertNotNull(actual);
+        assertEquals(expected, actual);
     }
 
     @Test

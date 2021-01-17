@@ -1,5 +1,6 @@
 package com.s0meth1ng;
 
+import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 public class Fraction implements IFraction {
@@ -90,7 +91,7 @@ public class Fraction implements IFraction {
     }
 
     @Override
-    public Fraction plus(Fraction fraction) {
+    public Fraction plus(@NotNull Fraction fraction) {
         int newDenominator = getLowestCommonDenominator(fraction);
         int newNumerator = this.getNewNumerator(newDenominator) + fraction.getNewNumerator(newDenominator);
         return new Fraction(newNumerator, newDenominator);
@@ -101,7 +102,7 @@ public class Fraction implements IFraction {
     }
 
     @Override
-    public Fraction minus(Fraction fraction) {
+    public Fraction minus(@NotNull Fraction fraction) {
         int newDenominator = getLowestCommonDenominator(fraction);
         int newNumerator = this.getNewNumerator(newDenominator) - fraction.getNewNumerator(newDenominator);
         return new Fraction(newNumerator, newDenominator);
@@ -112,7 +113,7 @@ public class Fraction implements IFraction {
     }
 
     @Override
-    public Fraction multiply(Fraction fraction) {
+    public Fraction multiply(@NotNull Fraction fraction) {
         return new Fraction(this.numerator * fraction.getNumerator(), this.denominator * fraction.getDenominator());
     }
     @Override
@@ -121,7 +122,7 @@ public class Fraction implements IFraction {
     }
 
     @Override
-    public Fraction divide(Fraction fraction) throws ArithmeticException {
+    public Fraction divide(@NotNull Fraction fraction) throws ArithmeticException {
         if (fraction.getNumerator() == 0) {
             throw new ArithmeticException("Division by zero");
         }
